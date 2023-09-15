@@ -1,5 +1,6 @@
 from .config import Config
 from passlib.context import CryptContext
+from fastapi import HTTPException
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from .user import User
@@ -16,12 +17,17 @@ class Auth():
     def get_password_hash(self, password):
         return self.pwd_context.hash(password)
 
-    def get_user(self, username: str):
+    def get_user(self, username: str, password: str):
         with Session(self.engine) as session:
-            return session.query(User).filter(User.username == username).first()
+            user = session.get(User(username, password))
+            if user:
+                return user
+
 
     def authenticate_user(self, username: str, password: str):
-        user = self.get_user(username)
-        if not user or not self.verify_password(password, user.password):
+        user = self.get_user(username, password)
+        if user:
+            if self.verify_password(password, user.password):
+                return True
             return False
-        return True
+        return False

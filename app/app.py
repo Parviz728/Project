@@ -16,7 +16,7 @@ def create_access_token(data: dict):
     data.setdefault("exp", expire)
     return jwt.encode(data, auth.config.secret_key, algorithm=auth.config.ALGORITHM)
 
-@app.post('/login')
+@app.post('/signin')
 def get_token(user_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     username = user_data.username
     password = user_data.password

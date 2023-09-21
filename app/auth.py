@@ -18,7 +18,7 @@ class Auth():
 
     def get_user(self, username: str, password: str):
         with Session(self.engine) as session:
-            user = session.get(User(username, password))
+            user = session.query(User).filter(User.username == username and User.password == password).first()
             if user:
                 return user
 
